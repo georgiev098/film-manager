@@ -35,7 +35,9 @@ services:
       - "8080:8080"
     volumes:
       - ./backend:/app
+      - ./.env:/app/.env
     command: air 
+
 
   # frontend:
   #   build:
