@@ -1,0 +1,77 @@
+####################################
+# Environment & secrets
+####################################
+.env
+.env.*
+!.env.example
+
+####################################
+# Go
+####################################
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Build / temp
+/tmp
+backend/tmp
+bin/
+
+# Go workspace
+/vendor/
+
+####################################
+# Air (Go hot reload)
+####################################
+.air.toml.tmp
+backend/tmp/
+
+####################################
+# Node / React / Vite
+####################################
+node_modules/
+frontend/node_modules/
+
+# Vite build output
+dist/
+frontend/dist/
+
+# Vite cache
+.vite/
+frontend/.vite/
+
+####################################
+# Logs
+####################################
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+####################################
+# Docker
+####################################
+# Named volumes (if ever bind-mounted)
+db-data/
+
+####################################
+# OS / Editor junk
+####################################
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+####################################
+# Coverage / tests
+####################################
+coverage/
+*.cover
