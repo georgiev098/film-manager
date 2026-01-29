@@ -5,6 +5,7 @@ import (
 
 	"github.com/georgiev098/film-manager/backend/internal/core"
 	"github.com/georgiev098/film-manager/backend/internal/handlers"
+	"github.com/georgiev098/film-manager/backend/internal/middlewares"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -15,6 +16,9 @@ func Register(deps *core.AppDeps) http.Handler {
 	// r.Use(middleware.RequestID)
 	// r.Use(middleware.RealIP)
 	// r.Use(middleware.Logger)
+
+	// --- CORS ---
+	r.Use(middlewares.CORS(deps))
 
 	// --- Health check ---
 	healthHandler := handlers.NewHealthHandler(deps)

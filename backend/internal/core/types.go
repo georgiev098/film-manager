@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	Port int
-	Env  string
-	Api  string
-	Db   struct {
+	Port           int
+	Env            string
+	Api            string
+	AllowedOrigins []string
+	Db             struct {
 		Dsn string
 	}
 }
