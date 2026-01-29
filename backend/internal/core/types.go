@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"log"
@@ -15,9 +15,8 @@ type Config struct {
 	}
 }
 
-type Application struct {
-	Config   Config
-	InfoLog  *log.Logger
-	ErrorLog *log.Logger
-	DB       *gorm.DB
+type AppDeps struct {
+	DB     *gorm.DB
+	Logger *log.Logger
+	Config Config
 }
