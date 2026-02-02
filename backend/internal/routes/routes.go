@@ -12,11 +12,6 @@ import (
 func Register(deps *core.AppDeps) http.Handler {
 	r := chi.NewRouter()
 
-	// --- Global middleware (later) ---
-	// r.Use(middleware.RequestID)
-	// r.Use(middleware.RealIP)
-	// r.Use(middleware.Logger)
-
 	// --- CORS ---
 	r.Use(middlewares.CORS(deps))
 
@@ -24,9 +19,11 @@ func Register(deps *core.AppDeps) http.Handler {
 	healthHandler := handlers.NewHealthHandler(deps)
 	r.Get("/health", healthHandler.Check)
 
-	// --- Movies (example for later) ---
-	// movieHandler := handlers.NewMovieHandler(deps)
-	// r.Get("/movies", movieHandler.List)
+	// --- Movies---
+	cameraHandler := handlers.NewCameraHandler(deps)
+	r.Route("/cameras", func(r chi.Router) {
+		r.Get("/", cameraHandler.GetAllCameras)
+	})
 
 	// --- Not found / method not allowed ---
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
