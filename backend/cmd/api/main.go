@@ -11,6 +11,7 @@ import (
 	"github.com/georgiev098/film-manager/backend/internal/app"
 	"github.com/georgiev098/film-manager/backend/internal/core"
 	"github.com/georgiev098/film-manager/backend/internal/db"
+	"github.com/georgiev098/film-manager/backend/internal/models"
 	"github.com/joho/godotenv"
 )
 
@@ -42,6 +43,12 @@ func main() {
 	}
 
 	app.DB = database
+
+	// ---- MIGRATE SCHEMA ----
+	err = app.DB.AutoMigrate(&models.User{}, &models.Camera{}, &models.Lens{})
+	if err != nil {
+		app.ErrorLog.Fatalf("AutoMigrate failed: %v", err)
+	}
 
 	// ---- COMPOSITION ROOT ----
 	// Bundle shared dependencies
