@@ -9,6 +9,7 @@ type Lens struct {
 	MinApertureStr string  `gorm:"not null" json:"min_aperture"`     // "f/2.8"
 	MaxApertureStr string  `gorm:"not null" json:"max_aperture"`     // "f/4.0"
 	Mount          string  `gorm:"not null" json:"mount"`            // "F-mount"
+	ImageURL       *string `json:"image_url"`                        // optional
 	Notes          *string `json:"notes"`                            // optional
 	UserID         uint    `gorm:"not null" json:"user_id"`
 	User           User    `gorm:"foreignKey:UserID" json:"-"`

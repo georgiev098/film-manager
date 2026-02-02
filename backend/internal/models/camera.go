@@ -17,6 +17,7 @@ type Camera struct {
 	Year         *int         `json:"year"`                       //optional
 	SerialNumber *string      `json:"serial_number"`              // optional
 	Notes        *string      `json:"notes"`                      // optional
+	ImageURL     *string      `json:"image_url"`                  // optional
 	UserID       uint         `gorm:"not null" json:"user_id"`    // associate with a user
 	User         User         `gorm:"foreignKey:UserID" json:"-"` // skip full user in JSON
 }
