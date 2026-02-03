@@ -58,3 +58,7 @@ func (r *CameraRepo) UpdateCamera(ctx context.Context, camera *models.Camera) er
 func (r *CameraRepo) DeleteCameraBy(ctx context.Context, camera *models.Camera) error {
 	return r.db.WithContext(ctx).Delete(camera).Error
 }
+
+func (r *CameraRepo) DeleteAllByUserID(ctx context.Context, userID uint) error {
+	return r.db.WithContext(ctx).Where("user_id = ?", userID).Delete(&models.Camera{}).Error
+}
