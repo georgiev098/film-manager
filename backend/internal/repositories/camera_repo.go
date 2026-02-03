@@ -26,7 +26,7 @@ func (r *CameraRepo) GetAllCameras(ctx context.Context) ([]models.Camera, error)
 	return cameras, nil
 }
 
-func (r *CameraRepo) GellAllCamerasByUserID(ctx context.Context, userID uint) ([]models.Camera, error) {
+func (r *CameraRepo) GetAllByUserID(ctx context.Context, userID uint) ([]models.Camera, error) {
 	var cameras []models.Camera
 	err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&cameras).Error
 	if err != nil {
@@ -38,4 +38,23 @@ func (r *CameraRepo) GellAllCamerasByUserID(ctx context.Context, userID uint) ([
 
 func (r *CameraRepo) CreateCamera(ctx context.Context, camera *models.Camera) error {
 	return r.db.WithContext(ctx).Create(camera).Error
+}
+
+func (r *CameraRepo) GetCameraByID(ctx context.Context, cameraID uint) (*models.Camera, error) {
+	var camera models.Camera
+
+	err := r.db.WithContext(ctx).First(&camera, cameraID).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &camera, nil
+}
+
+func (r *CameraRepo) UpdateCamera(ctx context.Context, camera *models.Camera) error {
+	return r.db.WithContext(ctx).Save(camera).Error
+}
+
+func (r *CameraRepo) DeleteCameraBy(ctx context.Context, camera *models.Camera) error {
+	return r.db.WithContext(ctx).Delete(camera).Error
 }
