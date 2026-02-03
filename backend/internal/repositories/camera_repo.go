@@ -35,3 +35,7 @@ func (r *CameraRepo) GellAllCamerasByUserID(ctx context.Context, userID uint) ([
 
 	return cameras, nil
 }
+
+func (r *CameraRepo) CreateCamera(ctx context.Context, camera *models.Camera) error {
+	return r.db.WithContext(ctx).Create(camera).Error
+}
