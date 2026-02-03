@@ -22,7 +22,12 @@ func Register(deps *core.AppDeps) http.Handler {
 	// --- Movies---
 	cameraHandler := handlers.NewCameraHandler(deps)
 	r.Route("/cameras", func(r chi.Router) {
-		r.Get("/", cameraHandler.GetAllCameras)
+		r.Get("/all", cameraHandler.GetAllCameras)
+		r.Get("/", cameraHandler.GetAllCamerasForUser)
+		r.Post("/", cameraHandler.CreateCamera)
+		r.Get("/{id}", cameraHandler.GetCameraByID)
+		r.Patch("/{id}", cameraHandler.UpdateCamera)
+		r.Delete("/{id}", cameraHandler.DeleteCamera)
 	})
 
 	// --- Not found / method not allowed ---

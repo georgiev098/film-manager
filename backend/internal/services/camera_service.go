@@ -47,14 +47,36 @@ func (s *CameraService) UpdateCamera(ctx context.Context, cameraID uint, userID 
 	if camera.UserID != userID {
 		return nil, errors.New("forbidden")
 	}
+	// Build map for GORM Updates
+	updates := map[string]any{}
 
-	camera.Brand = input.Brand
-	camera.CameraModel = input.CameraModel
-	camera.CameraFormat = input.CameraFormat
-	camera.Year = input.Year
-	camera.Notes = input.Notes
+	if input.Brand != "" {
+		updates["brand"] = input.Brand
+	}
+	if input.CameraModel != "" {
+		updates["camera_model"] = input.CameraModel
+	}
+	if input.CameraFormat != "" {
+		updates["camera_format"] = input.CameraFormat
+	}
+	if input.Year != nil {
+		updates["year"] = input.Year
+	}
+	if input.SerialNumber != nil {
+		updates["serial_number"] = input.SerialNumber
+	}
+	if input.Notes != nil {
+		updates["notes"] = input.Notes
+	}
+	if input.ImageURL != nil {
+		updates["image_url"] = input.ImageURL
+	}
 
-	err = s.repo.UpdateCamera(ctx, camera)
+	if len(updates) == 0 {
+		return camera, nil // nothing to update
+	}
+
+	err = s.repo.UpdateCamera(ctx, camera, updates)
 
 	if err != nil {
 		return nil, err

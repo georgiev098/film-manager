@@ -64,7 +64,7 @@ func (h *CameraHandler) CreateCamera(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get UserID from auth
-	camera.UserID = uint(5)
+	camera.UserID = uint(2)
 
 	err = h.service.CreateCamera(ctx, &camera)
 	if err != nil {
@@ -110,7 +110,7 @@ func (h *CameraHandler) UpdateCamera(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := uint(5) // get from auth later
+	userID := uint(2) // get from auth later
 
 	var inputCamera models.Camera
 
@@ -139,7 +139,7 @@ func (h *CameraHandler) DeleteCamera(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := uint(5) // change to retrieve from auth
+	userID := uint(2) // change to retrieve from auth
 
 	err = h.service.DeleteCamera(ctx, uint(cameraID), userID)
 	if err != nil {

@@ -51,8 +51,8 @@ func (r *CameraRepo) GetCameraByID(ctx context.Context, cameraID uint) (*models.
 	return &camera, nil
 }
 
-func (r *CameraRepo) UpdateCamera(ctx context.Context, camera *models.Camera) error {
-	return r.db.WithContext(ctx).Save(camera).Error
+func (r *CameraRepo) UpdateCamera(ctx context.Context, camera *models.Camera, updates map[string]any) error {
+	return r.db.WithContext(ctx).Model(camera).Updates(updates).Error
 }
 
 func (r *CameraRepo) DeleteCameraBy(ctx context.Context, camera *models.Camera) error {
