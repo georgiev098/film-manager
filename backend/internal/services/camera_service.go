@@ -95,6 +95,6 @@ func (s *CameraService) DeleteCamera(ctx context.Context, cameraID uint, userID 
 	if camera.UserID != userID {
 		return errors.New("forbidden")
 	}
-	return s.repo.DeleteCameraBy(ctx, camera)
+	return s.repo.DeleteCamera(ctx, camera)
 
 }

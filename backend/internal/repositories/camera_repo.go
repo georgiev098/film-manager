@@ -55,7 +55,7 @@ func (r *CameraRepo) UpdateCamera(ctx context.Context, camera *models.Camera, up
 	return r.db.WithContext(ctx).Model(camera).Updates(updates).Error
 }
 
-func (r *CameraRepo) DeleteCameraBy(ctx context.Context, camera *models.Camera) error {
+func (r *CameraRepo) DeleteCamera(ctx context.Context, camera *models.Camera) error {
 	return r.db.WithContext(ctx).Delete(camera).Error
 }
 
