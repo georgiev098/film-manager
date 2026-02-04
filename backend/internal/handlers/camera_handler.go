@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/georgiev098/film-manager/backend/internal/core"
+	"github.com/georgiev098/film-manager/backend/internal/dtos"
 	"github.com/georgiev098/film-manager/backend/internal/helpers"
 	"github.com/georgiev098/film-manager/backend/internal/models"
 	"github.com/georgiev098/film-manager/backend/internal/repositories"
@@ -69,7 +70,7 @@ func (h *CameraHandler) CreateCamera(w http.ResponseWriter, r *http.Request) {
 	err = h.service.CreateCamera(ctx, &camera)
 	if err != nil {
 		h.deps.Logger.Println("error creating camera:", err)
-		http.Error(w, "could not create camera", http.StatusBadRequest)
+		http.Error(w, "could not create camera", http.StatusInternalServerError)
 		return
 	}
 
@@ -112,7 +113,7 @@ func (h *CameraHandler) UpdateCamera(w http.ResponseWriter, r *http.Request) {
 
 	userID := uint(2) // get from auth later
 
-	var inputCamera models.Camera
+	var inputCamera dtos.CameraUpdate
 
 	err = helpers.ReadJSON(w, r, &inputCamera)
 	if err != nil {

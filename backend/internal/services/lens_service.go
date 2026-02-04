@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/georgiev098/film-manager/backend/internal/dtos"
 	"github.com/georgiev098/film-manager/backend/internal/models"
 	"github.com/georgiev098/film-manager/backend/internal/repositories"
 )
@@ -49,7 +50,7 @@ func (s *LensService) DeleteLens(ctx context.Context, lensID uint, userID uint) 
 	return s.repo.DeleteLens(ctx, lens)
 }
 
-func (s *LensService) UpdateLens(ctx context.Context, lensID uint, userID uint, input models.LensUpdate) (*models.Lens, error) {
+func (s *LensService) UpdateLens(ctx context.Context, lensID uint, userID uint, input dtos.LensUpdate) (*models.Lens, error) {
 	lens, err := s.repo.GetLensByID(ctx, lensID)
 	if err != nil {
 		return nil, err

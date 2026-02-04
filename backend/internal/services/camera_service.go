@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/georgiev098/film-manager/backend/internal/dtos"
 	"github.com/georgiev098/film-manager/backend/internal/models"
 	"github.com/georgiev098/film-manager/backend/internal/repositories"
 )
@@ -37,7 +38,7 @@ func (s *CameraService) GetCameraByID(ctx context.Context, cameraID uint) (*mode
 	return s.repo.GetCameraByID(ctx, cameraID)
 }
 
-func (s *CameraService) UpdateCamera(ctx context.Context, cameraID uint, userID uint, input models.CameraUpdate) (*models.Camera, error) {
+func (s *CameraService) UpdateCamera(ctx context.Context, cameraID uint, userID uint, input dtos.CameraUpdate) (*models.Camera, error) {
 	camera, err := s.repo.GetCameraByID(ctx, cameraID)
 	if err != nil {
 		return nil, err

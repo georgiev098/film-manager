@@ -1,4 +1,4 @@
-package models
+package dtos
 
 type LensUpdate struct {
 	FocalLengthMin *int    `json:"min_focal_length,omitempty"`
