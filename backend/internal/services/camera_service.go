@@ -37,7 +37,7 @@ func (s *CameraService) GetCameraByID(ctx context.Context, cameraID uint) (*mode
 	return s.repo.GetCameraByID(ctx, cameraID)
 }
 
-func (s *CameraService) UpdateCamera(ctx context.Context, cameraID uint, userID uint, input models.Camera) (*models.Camera, error) {
+func (s *CameraService) UpdateCamera(ctx context.Context, cameraID uint, userID uint, input models.CameraUpdate) (*models.Camera, error) {
 	camera, err := s.repo.GetCameraByID(ctx, cameraID)
 	if err != nil {
 		return nil, err
@@ -50,13 +50,13 @@ func (s *CameraService) UpdateCamera(ctx context.Context, cameraID uint, userID 
 	// Build map for GORM Updates
 	updates := map[string]any{}
 
-	if input.Brand != "" {
+	if input.Brand != nil {
 		updates["brand"] = input.Brand
 	}
-	if input.CameraModel != "" {
+	if input.CameraModel != nil {
 		updates["camera_model"] = input.CameraModel
 	}
-	if input.CameraFormat != "" {
+	if input.CameraFormat != nil {
 		updates["camera_format"] = input.CameraFormat
 	}
 	if input.Year != nil {
@@ -95,6 +95,13 @@ func (s *CameraService) DeleteCamera(ctx context.Context, cameraID uint, userID 
 	if camera.UserID != userID {
 		return errors.New("forbidden")
 	}
-	return s.repo.DeleteCamera(ctx, camera)
 
+	return s.repo.DeleteCamera(ctx, camera)
+}
+
+func (s *CameraService) DeleteAllByUser(ctx context.Context, requestingUserID, targetUserID uint) error {
+	if requestingUserID != targetUserID {
+		return errors.New("forbidden")
+	}
+	return s.repo.DeleteAllByUserID(ctx, targetUserID)
 }
