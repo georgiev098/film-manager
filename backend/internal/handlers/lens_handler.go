@@ -44,7 +44,7 @@ func (h *LensHandler) GetAllLenses(w http.ResponseWriter, r *http.Request) {
 
 func (h *LensHandler) GetAllLensesForUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userID := uint(2)
+	userID := uint(1)
 
 	lenses, err := h.service.GetAllForUser(ctx, userID)
 	if err != nil {
@@ -58,7 +58,7 @@ func (h *LensHandler) GetAllLensesForUser(w http.ResponseWriter, r *http.Request
 
 func (h *LensHandler) CreateLens(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userID := uint(2)
+	userID := uint(1)
 
 	var lens models.Lens
 
@@ -107,7 +107,7 @@ func (h *LensHandler) GetLensByID(w http.ResponseWriter, r *http.Request) {
 
 func (h *LensHandler) UpdateLens(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userID := uint(2) // get from auth later
+	userID := uint(1) // get from auth later
 
 	idParam := chi.URLParam(r, "id")
 	lensID, err := strconv.ParseUint(idParam, 10, 64)
@@ -135,7 +135,7 @@ func (h *LensHandler) UpdateLens(w http.ResponseWriter, r *http.Request) {
 
 func (h *LensHandler) DeleteLens(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userID := uint(2) // change to retrieve from auth
+	userID := uint(1) // change to retrieve from auth
 
 	idParam := chi.URLParam(r, "id")
 	lensID, err := strconv.ParseUint(idParam, 10, 64)

@@ -23,7 +23,7 @@ func (r *UserRepository) CraeteUser(ctx context.Context, user *models.User) erro
 
 func (r *UserRepository) GetUserByEmail(ctx context.Context, userEmail string) (*models.User, error) {
 	var user models.User
-	err := r.db.WithContext(ctx).Where("email = ?", userEmail).First(user).Error
+	err := r.db.WithContext(ctx).Where("email = ?", userEmail).First(&user).Error
 
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, userEmail string) (
 
 func (r *UserRepository) GetUserByID(ctx context.Context, userID uint) (*models.User, error) {
 	var user models.User
-	err := r.db.WithContext(ctx).First(user, userID).Error
+	err := r.db.WithContext(ctx).First(&user, userID).Error
 	if err != nil {
 		return nil, err
 	}

@@ -83,6 +83,15 @@ func (s *LensService) UpdateLens(ctx context.Context, lensID uint, userID uint, 
 	if input.Notes != nil {
 		updates["notes"] = input.Notes
 	}
+	if input.Manufacturer != nil {
+		updates["manufacturer"] = *input.Manufacturer
+	}
+	if input.LensType != nil {
+		updates["lens_type"] = *input.LensType
+	}
+	if input.ImageStabilization != nil {
+		updates["image_stabilization"] = *input.ImageStabilization
+	}
 
 	if len(updates) == 0 {
 		return lens, nil // nothing to update

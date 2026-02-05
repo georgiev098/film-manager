@@ -42,7 +42,7 @@ func (h *CameraHandler) GetAllCameras(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CameraHandler) GetAllCamerasForUser(w http.ResponseWriter, r *http.Request) {
-	userId := uint(2) //implement auth logic later
+	userId := uint(1) //implement auth logic later
 	cameras, err := h.service.GetAllForUser(r.Context(), userId)
 	if err != nil {
 		h.deps.Logger.Println("error fetching cameras:", err)
@@ -65,7 +65,7 @@ func (h *CameraHandler) CreateCamera(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get UserID from auth
-	camera.UserID = uint(2)
+	camera.UserID = uint(1)
 
 	err = h.service.CreateCamera(ctx, &camera)
 	if err != nil {
@@ -111,7 +111,7 @@ func (h *CameraHandler) UpdateCamera(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := uint(2) // get from auth later
+	userID := uint(1) // get from auth later
 
 	var inputCamera dtos.CameraUpdate
 
@@ -140,7 +140,7 @@ func (h *CameraHandler) DeleteCamera(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := uint(2) // change to retrieve from auth
+	userID := uint(1) // change to retrieve from auth
 
 	err = h.service.DeleteCamera(ctx, uint(cameraID), userID)
 	if err != nil {
