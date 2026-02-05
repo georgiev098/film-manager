@@ -14,10 +14,23 @@ func Register(deps *core.AppDeps) http.Handler {
 
 	// --- CORS ---
 	r.Use(middlewares.CORS(deps))
+	// --- Logging ---
+	r.Use(middlewares.Logging)
+	// --- Recovery ---
+	r.Use(middlewares.Recovery)
+	// --- Auth ---
+	r.Use(middlewares.Auth)
 
 	// --- Health check ---
 	healthHandler := handlers.NewHealthHandler(deps)
 	r.Get("/health", healthHandler.Check)
+
+	// --- Auth ---
+	userHandler := handlers.NewUserHandler(deps)
+	r.Route("/auth", func(r chi.Router) {
+		r.Post("/signup", userHandler.SignUp)
+		r.Post("/login", userHandler.Login)
+	})
 
 	// --- Cameras---
 	cameraHandler := handlers.NewCameraHandler(deps)
