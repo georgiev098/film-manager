@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/georgiev098/film-manager/backend/internal/core"
+	"github.com/georgiev098/film-manager/backend/internal/dtos"
 	"github.com/georgiev098/film-manager/backend/internal/helpers"
 	"github.com/georgiev098/film-manager/backend/internal/repositories"
 	"github.com/georgiev098/film-manager/backend/internal/services"
@@ -27,18 +28,21 @@ func NewUserHandler(deps *core.AppDeps) *UserHandler {
 func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	var input struct {
-		Email     string `json:"email"`
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-		Password  string `json:"password"`
-	}
+	var input dtos.SignUpRequest
 
 	err := helpers.ReadJSON(w, r, &input)
 	if err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
+
+	// --- VALIDATION START ---
+	if err := h.deps.Validate.Struct(input); err != nil {
+		errMap := helpers.ParseValidationErrors(err)
+		helpers.WriteJSON(w, http.StatusBadRequest, map[string]any{"errors": errMap}, nil)
+		return
+	}
+	// --- VALIDATION END ---
 
 	user, err := h.service.SignUp(ctx, input.Email, input.Password, input.FirstName, input.LastName)
 
@@ -52,16 +56,21 @@ func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	var input struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var input dtos.LoginRequest
 
 	err := helpers.ReadJSON(w, r, &input)
 	if err != nil {
 		http.Error(w, "invalid request", http.StatusBadRequest)
 		return
 	}
+
+	// --- VALIDATION START ---
+	if err := h.deps.Validate.Struct(input); err != nil {
+		errMap := helpers.ParseValidationErrors(err)
+		helpers.WriteJSON(w, http.StatusBadRequest, map[string]any{"errors": errMap}, nil)
+		return
+	}
+	// --- VALIDATION END ---
 
 	user, err := h.service.Login(ctx, input.Email, input.Password)
 	if err != nil {

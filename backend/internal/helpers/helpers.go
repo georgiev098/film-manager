@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -65,4 +66,48 @@ func HasPassword(password string) (string, error) {
 
 func CompareHashAndPassword(hash, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+}
+
+func ParseValidationErrors(err error) map[string]string {
+	errs := make(map[string]string)
+	vErrs, ok := err.(validator.ValidationErrors)
+	if !ok {
+		return nil
+	}
+
+	for _, e := range vErrs {
+		field := e.Field()
+
+		var message string
+		switch e.Tag() {
+		case "required":
+			message = "This field is required"
+		case "min":
+			message = "Value is too short (minimum " + e.Param() + " characters)"
+		case "max":
+			message = "Value is too long (maximum " + e.Param() + " characters)"
+		case "email":
+			message = "Invalid email format"
+		case "oneof":
+			message = "Must be one of: " + e.Param()
+		case "url":
+			message = "Must be a valid URL"
+		case "gt":
+			message = "Must be greater than " + e.Param()
+		case "lte":
+			message = "Must be " + e.Param() + " or earlier"
+		case "contains":
+			if e.Field() == "min_aperture" || e.Field() == "max_aperture" {
+				message = "Aperture must follow the format 'f/number' (e.g., f/2.8)"
+			} else {
+				message = "Value must contain: " + e.Param()
+			}
+		default:
+			message = "Invalid value (failed " + e.Tag() + ")"
+		}
+
+		errs[field] = message
+	}
+
+	return errs
 }

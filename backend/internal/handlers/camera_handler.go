@@ -67,6 +67,14 @@ func (h *CameraHandler) CreateCamera(w http.ResponseWriter, r *http.Request) {
 	// Get UserID from auth
 	camera.UserID = uint(1)
 
+	err = h.deps.Validate.Struct(camera)
+	if err != nil {
+		// map errors with helper
+		errMap := helpers.ParseValidationErrors(err)
+		helpers.WriteJSON(w, http.StatusBadRequest, map[string]any{"errors": errMap}, nil)
+		return
+	}
+
 	err = h.service.CreateCamera(ctx, &camera)
 	if err != nil {
 		h.deps.Logger.Println("error creating camera:", err)
@@ -74,7 +82,7 @@ func (h *CameraHandler) CreateCamera(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helpers.WriteJSON(w, http.StatusOK, camera, nil)
+	helpers.WriteJSON(w, http.StatusCreated, camera, nil)
 }
 
 func (h *CameraHandler) GetCameraByID(w http.ResponseWriter, r *http.Request) {
@@ -121,6 +129,14 @@ func (h *CameraHandler) UpdateCamera(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = h.deps.Validate.Struct(inputCamera)
+	if err != nil {
+		// map errors with helper
+		errMap := helpers.ParseValidationErrors(err)
+		helpers.WriteJSON(w, http.StatusBadRequest, map[string]any{"errors": errMap}, nil)
+		return
+	}
+
 	updatedCamera, err := h.service.UpdateCamera(ctx, uint(cameraID), userID, inputCamera)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
@@ -148,5 +164,5 @@ func (h *CameraHandler) DeleteCamera(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helpers.WriteJSON(w, http.StatusNoContent, nil, nil)
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/georgiev098/film-manager/backend/internal/core"
 	"github.com/georgiev098/film-manager/backend/internal/db"
 	"github.com/georgiev098/film-manager/backend/internal/models"
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
@@ -53,9 +54,10 @@ func main() {
 	// ---- COMPOSITION ROOT ----
 	// Bundle shared dependencies
 	deps := &core.AppDeps{
-		DB:     app.DB,
-		Logger: app.InfoLog,
-		Config: app.Config,
+		DB:       app.DB,
+		Logger:   app.InfoLog,
+		Config:   app.Config,
+		Validate: validator.New(),
 	}
 
 	err = app.Serve(ctx, deps)

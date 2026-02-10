@@ -3,6 +3,7 @@ package core
 import (
 	"log"
 
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +18,8 @@ type Config struct {
 }
 
 type AppDeps struct {
-	DB     *gorm.DB
-	Logger *log.Logger
-	Config Config
+	DB       *gorm.DB
+	Logger   *log.Logger
+	Config   Config
+	Validate *validator.Validate
 }

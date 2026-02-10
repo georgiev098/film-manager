@@ -71,6 +71,14 @@ func (h *LensHandler) CreateLens(w http.ResponseWriter, r *http.Request) {
 
 	lens.UserID = userID
 
+	err = h.deps.Validate.Struct(lens)
+	if err != nil {
+		// map errors with helper
+		errMap := helpers.ParseValidationErrors(err)
+		helpers.WriteJSON(w, http.StatusBadRequest, map[string]any{"errors": errMap}, nil)
+		return
+	}
+
 	err = h.service.CreateLens(ctx, &lens)
 	if err != nil {
 		h.deps.Logger.Println("error creating lens:", err)
@@ -119,7 +127,14 @@ func (h *LensHandler) UpdateLens(w http.ResponseWriter, r *http.Request) {
 	var inputLens dtos.LensUpdate
 	err = helpers.ReadJSON(w, r, &inputLens)
 	if err != nil {
-		http.Error(w, "invalid payload", http.StatusInternalServerError)
+		http.Error(w, "invalid payload", http.StatusBadRequest)
+		return
+	}
+
+	err = h.deps.Validate.Struct(inputLens)
+	if err != nil {
+		errMap := helpers.ParseValidationErrors(err)
+		helpers.WriteJSON(w, http.StatusBadRequest, map[string]any{"errors": errMap}, nil)
 		return
 	}
 
