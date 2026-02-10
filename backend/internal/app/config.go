@@ -17,6 +17,11 @@ func LoadConfig() core.Config {
 		dbHost = "localhost"
 	}
 
+	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		dbName = "film_manager"
+	}
+
 	dbUser := os.Getenv("DB_USER")
 	if dbUser == "" {
 		dbUser = "film_user"
@@ -48,7 +53,7 @@ func LoadConfig() core.Config {
 	flag.StringVar(
 		&cfg.Db.Dsn,
 		"dsn",
-		fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true&tls=false", dbUser, dbPassword, dbHost, os.Getenv("DB_NAME")),
+		fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true&tls=false", dbUser, dbPassword, dbHost, dbName),
 		"MySQL DSN",
 	)
 	flag.StringVar(&cfg.Api, "api", apiURL, "API URL")

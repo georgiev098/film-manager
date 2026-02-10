@@ -21,19 +21,24 @@ func Register(deps *core.AppDeps) http.Handler {
 	// --- Auth ---
 	r.Use(middlewares.Auth)
 
-	// --- Health check ---
+	// --- Handlers ---
 	healthHandler := handlers.NewHealthHandler(deps)
+	userHandler := handlers.NewUserHandler(deps)
+	cameraHandler := handlers.NewCameraHandler(deps)
+	lensHandler := handlers.NewLensHandler(deps)
+
+	// --- Health check ---
 	r.Get("/health", healthHandler.Check)
 
 	// --- Auth ---
-	userHandler := handlers.NewUserHandler(deps)
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/signup", userHandler.SignUp)
 		r.Post("/login", userHandler.Login)
+		r.Get("/:id/cameras", cameraHandler.GetAllCamerasForUser) // WIP
+		r.Get("/:id/lenses", lensHandler.GetAllLensesForUser)     // WIP
 	})
 
 	// --- Cameras---
-	cameraHandler := handlers.NewCameraHandler(deps)
 	r.Route("/cameras", func(r chi.Router) {
 		r.Get("/all", cameraHandler.GetAllCameras)
 		r.Get("/", cameraHandler.GetAllCamerasForUser)
@@ -44,7 +49,6 @@ func Register(deps *core.AppDeps) http.Handler {
 	})
 
 	// --- Lenses ---
-	lensHandler := handlers.NewLensHandler(deps)
 	r.Route("/lenses", func(r chi.Router) {
 		r.Get("/all", lensHandler.GetAllLenses)
 		r.Get("/", lensHandler.GetAllLensesForUser)

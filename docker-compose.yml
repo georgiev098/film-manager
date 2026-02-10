@@ -36,7 +36,6 @@ services:
     volumes:
       - ./backend:/app
       - ./.env:/app/.env
-    command: air 
 
 
   # frontend:

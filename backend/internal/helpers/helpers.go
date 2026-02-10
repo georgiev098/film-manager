@@ -3,18 +3,17 @@ package helpers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"maps"
 	"net/http"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 // helper to convert string env vars to int
 func AtoiOrDefault(s string, def int) int {
-	var val int
-	_, err := fmt.Sscanf(s, "%d", &val)
+	val, err := strconv.Atoi(s)
 	if err != nil {
 		return def
 	}
