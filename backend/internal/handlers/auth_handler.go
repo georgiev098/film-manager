@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/georgiev098/film-manager/backend/internal/core"
 	"github.com/georgiev098/film-manager/backend/internal/dtos"
@@ -94,64 +95,80 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Path:     "/auth/refresh", // only sent to refresh endpoint
+		HttpOnly: true,
+		Secure:   false, // true in production (HTTPS)
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(7 * 24 * time.Hour), // match refreshTTL
+	})
+
 	helpers.WriteJSON(w, http.StatusOK, map[string]any{
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
+		"access_token": accessToken,
 	}, nil)
 }
 
 func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	var body struct {
-		RefreshToken string `json:"refresh_token"`
-	}
-
-	err := helpers.ReadJSON(w, r, &body)
+	cookie, err := r.Cookie("refresh_token")
 	if err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		http.Error(w, "missing refresh token", http.StatusUnauthorized)
 		return
 	}
 
-	if body.RefreshToken == "" {
-		http.Error(w, "refresh token required", http.StatusBadRequest)
-		return
-	}
+	oldToken := cookie.Value
 
-	newAccessToken, newRefreshToken, err := h.authService.Refresh(ctx, body.RefreshToken)
+	newAccessToken, newRefreshToken, err := h.authService.Refresh(ctx, oldToken)
 	if err != nil {
 		http.Error(w, "refresh token required", http.StatusBadRequest)
 		return
 	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    newRefreshToken,
+		Path:     "/auth/refresh",
+		HttpOnly: true,
+		Secure:   false, // true in production
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(h.deps.Config.Auth.RefreshTTL),
+	})
 
 	helpers.WriteJSON(w, http.StatusOK, map[string]any{
-		"access_token":  newAccessToken,
-		"refresh_token": newRefreshToken,
+		"access_token": newAccessToken,
 	}, nil)
 }
 
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	var body struct {
-		RefreshToken string `json:"refresh_token"`
-	}
-
-	err := helpers.ReadJSON(w, r, &body)
+	// Read refresh token from httpOnly cookie
+	cookie, err := r.Cookie("refresh_token")
 	if err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		http.Error(w, "refresh token missing", http.StatusBadRequest)
 		return
 	}
+	refreshToken := cookie.Value
 
-	if body.RefreshToken == "" {
-		http.Error(w, "refresh token required", http.StatusBadRequest)
-	}
-
-	err = h.authService.Logout(ctx, body.RefreshToken)
+	// Revoke the refresh token in the database
+	err = h.authService.Logout(ctx, refreshToken)
 	if err != nil {
 		http.Error(w, "could not logout", http.StatusInternalServerError)
 		return
 	}
+
+	// Clear the cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Path:     "/auth/refresh",
+		HttpOnly: true,
+		Secure:   false, // true in production
+		Expires:  time.Unix(0, 0),
+	})
 
 	w.WriteHeader(http.StatusNoContent)
 }
