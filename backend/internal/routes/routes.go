@@ -23,7 +23,7 @@ func Register(deps *core.AppDeps) http.Handler {
 
 	// --- Handlers ---
 	healthHandler := handlers.NewHealthHandler(deps)
-	userHandler := handlers.NewUserHandler(deps)
+	authHandler := handlers.NewAuthHandler(deps)
 	cameraHandler := handlers.NewCameraHandler(deps)
 	lensHandler := handlers.NewLensHandler(deps)
 
@@ -32,10 +32,10 @@ func Register(deps *core.AppDeps) http.Handler {
 
 	// --- Auth ---
 	r.Route("/auth", func(r chi.Router) {
-		r.Post("/signup", userHandler.SignUp)
-		r.Post("/login", userHandler.Login)
-		r.Get("/:id/cameras", cameraHandler.GetAllCamerasForUser) // WIP
-		r.Get("/:id/lenses", lensHandler.GetAllLensesForUser)     // WIP
+		r.Post("/signup", authHandler.SignUp)
+		r.Post("/login", authHandler.Login)
+		r.Post("/refresh", authHandler.Refresh)
+		r.Post("/logout", authHandler.Logout)
 	})
 
 	// --- Cameras---

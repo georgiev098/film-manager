@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/georgiev098/film-manager/backend/internal/core"
 	"github.com/georgiev098/film-manager/backend/internal/helpers"
@@ -46,6 +47,33 @@ func LoadConfig() core.Config {
 	if env == "" {
 		env = "dev"
 	}
+
+	// JWT Config
+	jwtSecret := os.Getenv("JWT_ACCESS_SECRET")
+	if jwtSecret == "" {
+		// In dev allow fallback, but NEVER in prod
+		if env == "dev" {
+			jwtSecret = "dev-secret-change-me"
+		} else {
+			panic("JWT_ACCESS_SECRET is required in production")
+		}
+	}
+
+	accessTTL := os.Getenv("JWT_ACCESS_TTL_MINUTES")
+	if accessTTL == "" {
+		cfg.Auth.AccessTTL = 15 * time.Minute
+	} else {
+		cfg.Auth.AccessTTL = time.Duration(helpers.AtoiOrDefault(accessTTL, 15)) * time.Minute
+	}
+
+	refreshTTL := os.Getenv("JWT_REFRESH_TTL_DAYS")
+	if refreshTTL == "" {
+		cfg.Auth.RefreshTTL = 7 * 24 * time.Hour
+	} else {
+		cfg.Auth.RefreshTTL = time.Duration(helpers.AtoiOrDefault(refreshTTL, 7)) * 24 * time.Hour
+	}
+
+	cfg.Auth.AccessSecret = jwtSecret
 
 	// Flags to optionally override env vars
 	flag.IntVar(&cfg.Port, "port", helpers.AtoiOrDefault(port, 8080), "Server port")
