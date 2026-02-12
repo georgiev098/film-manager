@@ -8,6 +8,7 @@ import (
 	"github.com/georgiev098/film-manager/backend/internal/core"
 	"github.com/georgiev098/film-manager/backend/internal/dtos"
 	"github.com/georgiev098/film-manager/backend/internal/helpers"
+	"github.com/georgiev098/film-manager/backend/internal/middlewares"
 	"github.com/georgiev098/film-manager/backend/internal/models"
 	"github.com/georgiev098/film-manager/backend/internal/repositories"
 	"github.com/georgiev098/film-manager/backend/internal/services"
@@ -42,8 +43,12 @@ func (h *CameraHandler) GetAllCameras(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CameraHandler) GetAllCamerasForUser(w http.ResponseWriter, r *http.Request) {
-	userId := uint(1) //implement auth logic later
-	cameras, err := h.service.GetAllForUser(r.Context(), userId)
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	cameras, err := h.service.GetAllForUser(r.Context(), userID)
 	if err != nil {
 		h.deps.Logger.Println("error fetching cameras:", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -55,6 +60,11 @@ func (h *CameraHandler) GetAllCamerasForUser(w http.ResponseWriter, r *http.Requ
 
 func (h *CameraHandler) CreateCamera(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 	var camera models.Camera
 
 	err := helpers.ReadJSON(w, r, &camera)
@@ -65,7 +75,7 @@ func (h *CameraHandler) CreateCamera(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get UserID from auth
-	camera.UserID = uint(1)
+	camera.UserID = userID
 
 	err = h.deps.Validate.Struct(camera)
 	if err != nil {
@@ -119,7 +129,11 @@ func (h *CameraHandler) UpdateCamera(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := uint(1) // get from auth later
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	var inputCamera dtos.CameraUpdate
 
@@ -156,7 +170,11 @@ func (h *CameraHandler) DeleteCamera(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := uint(1) // change to retrieve from auth
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	err = h.service.DeleteCamera(ctx, uint(cameraID), userID)
 	if err != nil {

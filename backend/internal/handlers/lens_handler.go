@@ -8,6 +8,7 @@ import (
 	"github.com/georgiev098/film-manager/backend/internal/core"
 	"github.com/georgiev098/film-manager/backend/internal/dtos"
 	"github.com/georgiev098/film-manager/backend/internal/helpers"
+	"github.com/georgiev098/film-manager/backend/internal/middlewares"
 	"github.com/georgiev098/film-manager/backend/internal/models"
 	"github.com/georgiev098/film-manager/backend/internal/repositories"
 	"github.com/georgiev098/film-manager/backend/internal/services"
@@ -44,7 +45,11 @@ func (h *LensHandler) GetAllLenses(w http.ResponseWriter, r *http.Request) {
 
 func (h *LensHandler) GetAllLensesForUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userID := uint(1)
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	lenses, err := h.service.GetAllForUser(ctx, userID)
 	if err != nil {
@@ -58,8 +63,11 @@ func (h *LensHandler) GetAllLensesForUser(w http.ResponseWriter, r *http.Request
 
 func (h *LensHandler) CreateLens(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userID := uint(1)
-
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 	var lens models.Lens
 
 	err := helpers.ReadJSON(w, r, &lens)
@@ -115,7 +123,11 @@ func (h *LensHandler) GetLensByID(w http.ResponseWriter, r *http.Request) {
 
 func (h *LensHandler) UpdateLens(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userID := uint(1) // get from auth later
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	idParam := chi.URLParam(r, "id")
 	lensID, err := strconv.ParseUint(idParam, 10, 64)
@@ -150,7 +162,11 @@ func (h *LensHandler) UpdateLens(w http.ResponseWriter, r *http.Request) {
 
 func (h *LensHandler) DeleteLens(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userID := uint(1) // change to retrieve from auth
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	idParam := chi.URLParam(r, "id")
 	lensID, err := strconv.ParseUint(idParam, 10, 64)

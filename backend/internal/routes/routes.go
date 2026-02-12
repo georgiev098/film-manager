@@ -18,8 +18,6 @@ func Register(deps *core.AppDeps) http.Handler {
 	r.Use(middlewares.Logging)
 	// --- Recovery ---
 	r.Use(middlewares.Recovery)
-	// --- Auth ---
-	r.Use(middlewares.Auth)
 
 	// --- Handlers ---
 	healthHandler := handlers.NewHealthHandler(deps)
@@ -38,25 +36,30 @@ func Register(deps *core.AppDeps) http.Handler {
 		r.Post("/logout", authHandler.Logout)
 	})
 
-	// --- Cameras---
-	r.Route("/cameras", func(r chi.Router) {
-		r.Get("/all", cameraHandler.GetAllCameras)
-		r.Get("/", cameraHandler.GetAllCamerasForUser)
-		r.Post("/", cameraHandler.CreateCamera)
-		r.Get("/{id}", cameraHandler.GetCameraByID)
-		r.Patch("/{id}", cameraHandler.UpdateCamera)
-		r.Delete("/{id}", cameraHandler.DeleteCamera)
-	})
+	// Protected routes
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.Auth(deps))
 
-	// --- Lenses ---
-	r.Route("/lenses", func(r chi.Router) {
-		r.Get("/all", lensHandler.GetAllLenses)
-		r.Get("/", lensHandler.GetAllLensesForUser)
-		r.Post("/", lensHandler.CreateLens)
-		r.Get("/{id}", lensHandler.GetLensByID)
-		r.Patch("/{id}", lensHandler.UpdateLens)
-		r.Delete("/{id}", lensHandler.DeleteLens)
+		// --- Cameras---
+		r.Route("/cameras", func(r chi.Router) {
+			r.Get("/all", cameraHandler.GetAllCameras)
+			r.Get("/", cameraHandler.GetAllCamerasForUser)
+			r.Post("/", cameraHandler.CreateCamera)
+			r.Get("/{id}", cameraHandler.GetCameraByID)
+			r.Patch("/{id}", cameraHandler.UpdateCamera)
+			r.Delete("/{id}", cameraHandler.DeleteCamera)
+		})
 
+		// --- Lenses ---
+		r.Route("/lenses", func(r chi.Router) {
+			r.Get("/all", lensHandler.GetAllLenses)
+			r.Get("/", lensHandler.GetAllLensesForUser)
+			r.Post("/", lensHandler.CreateLens)
+			r.Get("/{id}", lensHandler.GetLensByID)
+			r.Patch("/{id}", lensHandler.UpdateLens)
+			r.Delete("/{id}", lensHandler.DeleteLens)
+
+		})
 	})
 
 	// --- Not found / method not allowed ---
