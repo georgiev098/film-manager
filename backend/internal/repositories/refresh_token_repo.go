@@ -38,12 +38,18 @@ func (r *RefreshTokenRepository) FindTokenByHash(ctx context.Context, tokenHash 
 
 // Revoke a refresh token by ID
 func (r *RefreshTokenRepository) Revoke(ctx context.Context, tokenId uint) error {
-	return r.db.WithContext(ctx).Where("id = ?", tokenId).Update("revoked", true).Error
+	return r.db.WithContext(ctx).
+		Model(&models.RefreshToken{}). // ← specify table/model
+		Where("id = ?", tokenId).
+		Update("revoked", true).Error
 }
 
 // Revoke all refresh tokens by userID (logout everywhere)
 func (r *RefreshTokenRepository) RevokeAllByUser(ctx context.Context, userID uint) error {
-	return r.db.WithContext(ctx).Model(&models.RefreshToken{}).Where("user_id = ?", userID).Update("revoked", true).Error
+	return r.db.WithContext(ctx).
+		Model(&models.RefreshToken{}).
+		Where("user_id = ?", userID).
+		Update("revoked", true).Error
 }
 
 // Delete expired tokens

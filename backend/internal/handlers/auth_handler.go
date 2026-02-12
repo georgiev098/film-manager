@@ -64,10 +64,19 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Path:     "/auth",
+		HttpOnly: true,
+		Secure:   false, // true in production (HTTPS)
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(h.deps.Config.Auth.RefreshTTL),
+	})
+
 	helpers.WriteJSON(w, http.StatusCreated, map[string]any{
-		"user":          user,
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
+		"user":         user,
+		"access_token": accessToken,
 	}, nil)
 }
 
@@ -98,7 +107,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    refreshToken,
-		Path:     "/auth/refresh", // only sent to refresh endpoint
+		Path:     "/auth",
 		HttpOnly: true,
 		Secure:   false, // true in production (HTTPS)
 		SameSite: http.SameSiteStrictMode,
@@ -130,7 +139,7 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    newRefreshToken,
-		Path:     "/auth/refresh",
+		Path:     "/auth",
 		HttpOnly: true,
 		Secure:   false, // true in production
 		SameSite: http.SameSiteStrictMode,
@@ -164,7 +173,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    "",
-		Path:     "/auth/refresh",
+		Path:     "/auth",
 		HttpOnly: true,
 		Secure:   false, // true in production
 		Expires:  time.Unix(0, 0),

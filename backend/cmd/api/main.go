@@ -46,7 +46,7 @@ func main() {
 	app.DB = database
 
 	// ---- MIGRATE SCHEMA ----
-	err = app.DB.AutoMigrate(&models.User{}, &models.Camera{}, &models.Lens{})
+	err = app.DB.AutoMigrate(&models.User{}, &models.Camera{}, &models.Lens{}, &models.RefreshToken{})
 	if err != nil {
 		app.ErrorLog.Fatalf("AutoMigrate failed: %v", err)
 	}
