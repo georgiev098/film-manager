@@ -107,7 +107,13 @@ func (h *LensHandler) GetLensByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lens, err := h.service.GetLensByID(ctx, uint(lensID))
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	lens, err := h.service.GetLensByID(ctx, uint(lensID), userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			http.Error(w, "lens not found", http.StatusNotFound)

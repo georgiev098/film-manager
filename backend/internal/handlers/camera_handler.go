@@ -105,7 +105,13 @@ func (h *CameraHandler) GetCameraByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	camera, err := h.service.GetCameraByID(ctx, uint(cameraID))
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	camera, err := h.service.GetCameraByID(ctx, uint(cameraID), userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			http.Error(w, "camera not found", http.StatusNotFound)

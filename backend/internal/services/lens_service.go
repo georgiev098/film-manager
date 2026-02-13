@@ -7,6 +7,7 @@ import (
 	"github.com/georgiev098/film-manager/backend/internal/dtos"
 	"github.com/georgiev098/film-manager/backend/internal/models"
 	"github.com/georgiev098/film-manager/backend/internal/repositories"
+	"gorm.io/gorm"
 )
 
 type LensService struct {
@@ -27,8 +28,17 @@ func (s *LensService) GetAllForUser(ctx context.Context, userID uint) ([]models.
 	return s.repo.GetAllByUserID(ctx, userID)
 }
 
-func (s *LensService) GetLensByID(ctx context.Context, lensID uint) (*models.Lens, error) {
-	return s.repo.GetLensByID(ctx, lensID)
+func (s *LensService) GetLensByID(ctx context.Context, lensID uint, userID uint) (*models.Lens, error) {
+	lens, err := s.repo.GetLensByID(ctx, lensID)
+	if err != nil {
+		return nil, err
+	}
+
+	if lens.UserID != userID {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	return lens, nil
 }
 
 func (s *LensService) CreateLens(ctx context.Context, lens *models.Lens) error {

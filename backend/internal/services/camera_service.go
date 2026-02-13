@@ -7,6 +7,7 @@ import (
 	"github.com/georgiev098/film-manager/backend/internal/dtos"
 	"github.com/georgiev098/film-manager/backend/internal/models"
 	"github.com/georgiev098/film-manager/backend/internal/repositories"
+	"gorm.io/gorm"
 )
 
 type CameraService struct {
@@ -34,8 +35,19 @@ func (s *CameraService) GetAllForUser(ctx context.Context, userID uint) ([]model
 	return s.repo.GetAllByUserID(ctx, userID)
 }
 
-func (s *CameraService) GetCameraByID(ctx context.Context, cameraID uint) (*models.Camera, error) {
-	return s.repo.GetCameraByID(ctx, cameraID)
+func (s *CameraService) GetCameraByID(ctx context.Context, cameraID uint, userID uint) (*models.Camera, error) {
+
+	camera, err := s.repo.GetCameraByID(ctx, cameraID)
+	if err != nil {
+		return nil, err
+	}
+
+	// ownership check
+	if camera.UserID != userID {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	return camera, nil
 }
 
 func (s *CameraService) UpdateCamera(ctx context.Context, cameraID uint, userID uint, input dtos.CameraUpdate) (*models.Camera, error) {
