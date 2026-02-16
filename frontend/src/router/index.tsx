@@ -10,6 +10,7 @@ import AddCameraPage from "@/pages/AddCameraPage";
 import CameraDetailPage from "@/pages/CameraDetailPage";
 import AddLensPage from "@/pages/AddLensPage";
 import LensDetailPage from "@/pages/LensDetailPage";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 // export default function AppRouter() {
 //   return (
@@ -41,7 +42,7 @@ import LensDetailPage from "@/pages/LensDetailPage";
 
 const routes: RouteObject[] = [
   {
-    // Auth Routes
+    // Public Auth Routes (Redirects to Dashboard if already logged in)
     element: <AuthLayout />,
     children: [
       { path: "login", element: <LoginPage /> },
@@ -49,24 +50,30 @@ const routes: RouteObject[] = [
     ],
   },
   {
-    // App Routes
-    element: <MainLayout />,
+    // PROTECTED APP ROUTES
+    // 1. First, check if the user is authenticated
+    element: <ProtectedRoute />,
     children: [
-      { path: "dashboard", element: <DashboardPage /> },
       {
-        path: "cameras",
+        element: <MainLayout />,
         children: [
-          { index: true, element: <CamerasPage /> },
-          { path: ":id", element: <CameraDetailPage /> },
-          { path: "new", element: <AddCameraPage /> },
-        ],
-      },
-      {
-        path: "lenses",
-        children: [
-          { index: true, element: <LensesPage /> },
-          { path: ":id", element: <LensDetailPage /> },
-          { path: "new", element: <AddLensPage /> },
+          { path: "dashboard", element: <DashboardPage /> },
+          {
+            path: "cameras",
+            children: [
+              { index: true, element: <CamerasPage /> },
+              { path: ":id", element: <CameraDetailPage /> },
+              { path: "new", element: <AddCameraPage /> },
+            ],
+          },
+          {
+            path: "lenses",
+            children: [
+              { index: true, element: <LensesPage /> },
+              { path: ":id", element: <LensDetailPage /> },
+              { path: "new", element: <AddLensPage /> },
+            ],
+          },
         ],
       },
     ],
