@@ -38,21 +38,21 @@ services:
       - ./.env:/app/.env
 
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #   container_name: film-frontend
-  #   restart: unless-stopped
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "5173:5173"
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules
-  #   depends_on:
-  #     - api
-  #   command: npm run dev -- --host
+  frontend:
+    build:
+      context: ./frontend
+    container_name: film-frontend
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    command: npm run dev -- --host
 
 volumes:
   db-data:
