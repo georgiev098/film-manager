@@ -1,8 +1,11 @@
 // ─── Auth ───────────────────────────────────────────
-export interface User {
+export interface BaseModel {
   ID: number;
   CreatedAt: string;
   UpdatedAt: string;
+}
+
+export interface User extends BaseModel {
   username: string;
   email: string;
 }
@@ -26,10 +29,7 @@ export interface AuthResponse {
 // ─── Camera ─────────────────────────────────────────
 export type CameraFormat = "35mm" | "120mm";
 
-export interface Camera {
-  ID: number;
-  CreatedAt: string;
-  UpdatedAt: string;
+export interface Camera extends BaseModel {
   brand: string;
   camera_model: string;
   camera_format: CameraFormat;
@@ -53,10 +53,7 @@ export interface CameraPayload {
 // ─── Lens ───────────────────────────────────────────
 export type LensType = "analog" | "digital";
 
-export interface Lens {
-  ID: number;
-  CreatedAt: string;
-  UpdatedAt: string;
+export interface Lens extends BaseModel {
   manufacturer: string;
   lens_type: LensType;
   image_stabilization: boolean;
