@@ -17,6 +17,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "types": ["node"],
+    "allowJs": true, // Recommended: lets TS handle JS files too
+    "esModuleInterop": true, // Recommended: fixes issues with some imports
     "paths": {
       "@/*": ["./src/*"]
     }

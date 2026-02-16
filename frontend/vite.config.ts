@@ -15,6 +15,11 @@ export default defineConfig({
       "/api": {
         target: "http://film-api:8080",
         changeOrigin: true,
+        configure: (proxy, _options) => {
+          proxy.on("error", (err, _req, _res) => {
+            console.log("proxy error", err);
+          });
+        },
       },
     },
   },
