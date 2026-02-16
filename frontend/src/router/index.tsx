@@ -23,9 +23,13 @@ export default function AppRouter() {
       {/* App routes (auth bypassed for dev) */}
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
+
         <Route path="/cameras" element={<CamerasPage />} />
+        <Route path="/cameras/:id" element={<CameraDetailPage />} />
         <Route path="/cameras/new" element={<AddCameraPage />} />
+
         <Route path="/lenses" element={<LensesPage />} />
+        <Route path="/lenses/:id" element={<LensDetailPage />} />
         <Route path="/lenses/new" element={<AddLensPage />} />
       </Route>
 
