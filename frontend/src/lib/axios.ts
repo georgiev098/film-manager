@@ -12,12 +12,12 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // If we get a 401, we just pass it along.
     if (error.response?.status === 401) {
-      // Clear any local auth state and redirect to login
-      window.location.href = "/login";
+      console.warn("Unauthorized! User session may have expired.");
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
