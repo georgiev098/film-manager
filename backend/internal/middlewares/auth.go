@@ -17,19 +17,23 @@ func Auth(deps *core.AppDeps) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
+			var tokenString string
+
+			// 1. Try Authorization header (for Postman/mobile)
 			authHeader := r.Header.Get("Authorization")
-			if authHeader == "" {
-				http.Error(w, "missing authorization header", http.StatusUnauthorized)
-				return
+			if after, ok := strings.CutPrefix(authHeader, "Bearer "); ok {
+				tokenString = after
 			}
 
-			parts := strings.Split(authHeader, " ")
-			if len(parts) != 2 || parts[0] != "Bearer" {
-				http.Error(w, "invalid authorization header", http.StatusUnauthorized)
-				return
+			// 2. Fallback to cookie (browser)
+			if tokenString == "" {
+				cookie, err := r.Cookie("access_token")
+				if err != nil {
+					http.Error(w, "unauthorized", http.StatusUnauthorized)
+					return
+				}
+				tokenString = cookie.Value
 			}
-
-			tokenString := parts[1]
 
 			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 				return []byte(deps.Config.Auth.AccessSecret), nil

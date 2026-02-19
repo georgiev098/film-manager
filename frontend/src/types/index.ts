@@ -24,7 +24,6 @@ export interface RegisterPayload {
 
 export interface AuthResponse {
   user: User;
-  token?: string;
 }
 
 // ─── Camera ─────────────────────────────────────────

@@ -74,9 +74,18 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(h.deps.Config.Auth.RefreshTTL),
 	})
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    accessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false, // true in production
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(h.deps.Config.Auth.AccessTTL),
+	})
+
 	helpers.WriteJSON(w, http.StatusCreated, map[string]any{
-		"user":         user,
-		"access_token": accessToken,
+		"user": user,
 	}, nil)
 }
 
@@ -114,8 +123,18 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(7 * 24 * time.Hour), // match refreshTTL
 	})
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    accessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false, // true in production
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(h.deps.Config.Auth.AccessTTL),
+	})
+
 	helpers.WriteJSON(w, http.StatusOK, map[string]any{
-		"access_token": accessToken,
+		"message": "ok",
 	}, nil)
 }
 
@@ -145,9 +164,18 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteStrictMode,
 		Expires:  time.Now().Add(h.deps.Config.Auth.RefreshTTL),
 	})
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    newAccessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false, // true in production
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(h.deps.Config.Auth.AccessTTL),
+	})
 
 	helpers.WriteJSON(w, http.StatusOK, map[string]any{
-		"access_token": newAccessToken,
+		"message": "ok",
 	}, nil)
 }
 
@@ -176,6 +204,15 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		Path:     "/auth",
 		HttpOnly: true,
 		Secure:   false, // true in production
+		Expires:  time.Unix(0, 0),
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false,
 		Expires:  time.Unix(0, 0),
 	})
 
