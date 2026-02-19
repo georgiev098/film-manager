@@ -2,13 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useCameras } from "@/hooks/useCameras";
 import { useLenses } from "@/hooks/useLenses";
-import {
-  Camera,
-  CircleDot,
-  ArrowRight,
-  Plus,
-  Loader2,
-} from "lucide-react";
+import { Camera, CircleDot, ArrowRight, Plus, Loader2 } from "lucide-react";
 import CameraCard from "@/components/CameraCard";
 import LensCard from "@/components/LensCard";
 
@@ -33,13 +27,6 @@ export default function DashboardPage() {
             Here is an overview of your gear collection.
           </p>
         </div>
-        <Link
-          to="/cameras/new"
-          className="flex w-fit items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          <Plus className="h-4 w-4" />
-          Add Gear
-        </Link>
       </div>
 
       {/* Stats Grid */}

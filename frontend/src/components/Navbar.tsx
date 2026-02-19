@@ -52,7 +52,7 @@ export default function Navbar() {
                   "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-secondary text-foreground"
-                    : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                    : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
                 )
               }
             >
@@ -64,13 +64,6 @@ export default function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden items-center gap-3 md:flex">
-          <Link
-            to="/cameras/new"
-            className="flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            <Plus className="h-4 w-4" />
-            Add Gear
-          </Link>
           <div className="flex items-center gap-3 border-l border-border pl-3">
             <span className="text-sm text-muted-foreground">
               {user?.username}
@@ -91,7 +84,11 @@ export default function Navbar() {
           className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground md:hidden"
           aria-label="Toggle menu"
         >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {mobileOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
         </button>
       </div>
 
@@ -109,7 +106,7 @@ export default function Navbar() {
                     "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                     isActive
                       ? "bg-secondary text-foreground"
-                      : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                      : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
                   )
                 }
               >
@@ -117,17 +114,11 @@ export default function Navbar() {
                 {link.label}
               </NavLink>
             ))}
-            <Link
-              to="/cameras/new"
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-2.5 rounded-lg bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground"
-            >
-              <Plus className="h-4 w-4" />
-              Add Gear
-            </Link>
           </nav>
           <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-            <span className="text-sm text-muted-foreground">{user?.username}</span>
+            <span className="text-sm text-muted-foreground">
+              {user?.username}
+            </span>
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
