@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Camera, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -13,14 +15,23 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
     try {
       await login({ email, password });
+      // SUCCESS Toast
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+      });
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Invalid email or password";
       setError(message);
+      toast({
+        variant: "destructive", // This makes it red
+        title: "Login Failed",
+        description: message,
+      });
     } finally {
       setLoading(false);
     }

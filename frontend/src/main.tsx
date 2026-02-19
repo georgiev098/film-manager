@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AuthProvider } from "@/lib/auth-context";
 import AppRouter from "@/router";
 import "@/index.css";
+import { Toaster } from "./components/ui/toaster";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,9 +24,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <AuthProvider>
           <AppRouter />
+          <Toaster />
         </AuthProvider>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -3,10 +3,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCreateCamera } from "@/hooks/useCameras";
 import type { CameraFormat } from "@/types";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AddCameraPage() {
   const navigate = useNavigate();
   const createCamera = useCreateCamera();
+  const { toast } = useToast();
 
   const [brand, setBrand] = useState("");
   const [cameraModel, setCameraModel] = useState("");
@@ -31,8 +33,20 @@ export default function AddCameraPage() {
         notes: notes || null,
         image_url: imageUrl || null,
       });
+
+      toast({
+        title: "Camera added",
+        description: `${brand} ${cameraModel} is now in your vault.`,
+      });
+
       navigate("/cameras");
-    } catch {
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Failed to add camera",
+        description:
+          error?.message || "Please check your details and try again.",
+      });
       setError("Failed to add camera. Please check your inputs.");
     }
   };
@@ -70,7 +84,10 @@ export default function AddCameraPage() {
         {/* Brand & Model */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="brand" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="brand"
+              className="text-sm font-medium text-foreground"
+            >
               Brand <span className="text-destructive">*</span>
             </label>
             <input
@@ -84,7 +101,10 @@ export default function AddCameraPage() {
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="model" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="model"
+              className="text-sm font-medium text-foreground"
+            >
               Model <span className="text-destructive">*</span>
             </label>
             <input
@@ -102,7 +122,10 @@ export default function AddCameraPage() {
         {/* Format & Year */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="format" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="format"
+              className="text-sm font-medium text-foreground"
+            >
               Format <span className="text-destructive">*</span>
             </label>
             <select
@@ -116,7 +139,10 @@ export default function AddCameraPage() {
             </select>
           </div>
           <div className="space-y-2">
-            <label htmlFor="year" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="year"
+              className="text-sm font-medium text-foreground"
+            >
               Year
             </label>
             <input
@@ -135,7 +161,10 @@ export default function AddCameraPage() {
         {/* Serial & Image URL */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="serial" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="serial"
+              className="text-sm font-medium text-foreground"
+            >
               Serial Number
             </label>
             <input
@@ -148,7 +177,10 @@ export default function AddCameraPage() {
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="imageUrl" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="imageUrl"
+              className="text-sm font-medium text-foreground"
+            >
               Image URL
             </label>
             <input
@@ -164,7 +196,10 @@ export default function AddCameraPage() {
 
         {/* Notes */}
         <div className="space-y-2">
-          <label htmlFor="notes" className="text-sm font-medium text-foreground">
+          <label
+            htmlFor="notes"
+            className="text-sm font-medium text-foreground"
+          >
             Notes
           </label>
           <textarea

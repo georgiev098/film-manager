@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useCamera, useUpdateCamera, useDeleteCamera } from "@/hooks/useCameras";
+import {
+  useCamera,
+  useUpdateCamera,
+  useDeleteCamera,
+} from "@/hooks/useCameras";
 import { formatDate } from "@/lib/utils";
 import type { CameraFormat } from "@/types";
 import {
@@ -16,10 +20,12 @@ import {
   Loader2,
   Check,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CameraDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { data: camera, isLoading, isError } = useCamera(Number(id));
   const updateCamera = useUpdateCamera();
   const deleteCamera = useDeleteCamera();
@@ -71,8 +77,17 @@ export default function CameraDetailPage() {
         },
       });
       setEditing(false);
+      toast({
+        title: "Camera updated",
+        description: `${brand} ${cameraModel} has been saved.`,
+      });
     } catch {
       setError("Failed to update camera.");
+      toast({
+        variant: "destructive",
+        title: "Update failed",
+        description: "Could not save changes to the camera vault.",
+      });
     }
   };
 
@@ -80,8 +95,17 @@ export default function CameraDetailPage() {
     if (!window.confirm("Are you sure you want to delete this camera?")) return;
     try {
       await deleteCamera.mutateAsync(Number(id));
+      toast({
+        title: "Camera deleted",
+        description: "The item has been removed from your collection.",
+      });
       navigate("/cameras");
     } catch {
+      toast({
+        variant: "destructive",
+        title: "Delete failed",
+        description: "An error occurred while trying to remove this camera.",
+      });
       setError("Failed to delete camera.");
     }
   };
@@ -109,7 +133,9 @@ export default function CameraDetailPage() {
         </Link>
         <div className="rounded-xl border border-border bg-card p-12 text-center">
           <CameraIcon className="mx-auto h-12 w-12 text-muted-foreground/30" />
-          <p className="mt-4 text-lg font-medium text-foreground">Camera not found</p>
+          <p className="mt-4 text-lg font-medium text-foreground">
+            Camera not found
+          </p>
           <p className="mt-1 text-sm text-muted-foreground">
             This camera may have been removed or the link is incorrect.
           </p>
@@ -167,7 +193,9 @@ export default function CameraDetailPage() {
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-3">
             <CameraIcon className="h-16 w-16 text-muted-foreground/20" />
-            <p className="text-sm text-muted-foreground/40">No image uploaded</p>
+            <p className="text-sm text-muted-foreground/40">
+              No image uploaded
+            </p>
           </div>
         )}
         <span className="absolute left-4 top-4 flex items-center gap-1.5 rounded-lg bg-background/80 px-3 py-1.5 text-sm font-medium text-foreground backdrop-blur-sm">
@@ -178,9 +206,14 @@ export default function CameraDetailPage() {
 
       {/* Content */}
       {editing ? (
-        <form onSubmit={handleSave} className="space-y-6 rounded-xl border border-border bg-card p-6">
+        <form
+          onSubmit={handleSave}
+          className="space-y-6 rounded-xl border border-border bg-card p-6"
+        >
           <div className="flex items-center justify-between border-b border-border pb-4">
-            <h2 className="text-lg font-semibold text-foreground">Edit Camera</h2>
+            <h2 className="text-lg font-semibold text-foreground">
+              Edit Camera
+            </h2>
             <button
               type="button"
               onClick={cancelEditing}
@@ -192,48 +225,118 @@ export default function CameraDetailPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="edit-brand" className="text-sm font-medium text-foreground">
+              <label
+                htmlFor="edit-brand"
+                className="text-sm font-medium text-foreground"
+              >
                 Brand <span className="text-destructive">*</span>
               </label>
-              <input id="edit-brand" type="text" value={brand} onChange={(e) => setBrand(e.target.value)} required className={inputClasses} />
+              <input
+                id="edit-brand"
+                type="text"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                required
+                className={inputClasses}
+              />
             </div>
             <div className="space-y-2">
-              <label htmlFor="edit-model" className="text-sm font-medium text-foreground">
+              <label
+                htmlFor="edit-model"
+                className="text-sm font-medium text-foreground"
+              >
                 Model <span className="text-destructive">*</span>
               </label>
-              <input id="edit-model" type="text" value={cameraModel} onChange={(e) => setCameraModel(e.target.value)} required className={inputClasses} />
+              <input
+                id="edit-model"
+                type="text"
+                value={cameraModel}
+                onChange={(e) => setCameraModel(e.target.value)}
+                required
+                className={inputClasses}
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="edit-format" className="text-sm font-medium text-foreground">
+              <label
+                htmlFor="edit-format"
+                className="text-sm font-medium text-foreground"
+              >
                 Format <span className="text-destructive">*</span>
               </label>
-              <select id="edit-format" value={cameraFormat} onChange={(e) => setCameraFormat(e.target.value as CameraFormat)} className={inputClasses}>
+              <select
+                id="edit-format"
+                value={cameraFormat}
+                onChange={(e) =>
+                  setCameraFormat(e.target.value as CameraFormat)
+                }
+                className={inputClasses}
+              >
                 <option value="35mm">35mm</option>
                 <option value="120mm">120mm (Medium Format)</option>
               </select>
             </div>
             <div className="space-y-2">
-              <label htmlFor="edit-year" className="text-sm font-medium text-foreground">Year</label>
-              <input id="edit-year" type="number" value={year} onChange={(e) => setYear(e.target.value)} min={1800} max={2026} className={inputClasses} />
+              <label
+                htmlFor="edit-year"
+                className="text-sm font-medium text-foreground"
+              >
+                Year
+              </label>
+              <input
+                id="edit-year"
+                type="number"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                min={1800}
+                max={2026}
+                className={inputClasses}
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="edit-serial" className="text-sm font-medium text-foreground">Serial Number</label>
-              <input id="edit-serial" type="text" value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} className={inputClasses} />
+              <label
+                htmlFor="edit-serial"
+                className="text-sm font-medium text-foreground"
+              >
+                Serial Number
+              </label>
+              <input
+                id="edit-serial"
+                type="text"
+                value={serialNumber}
+                onChange={(e) => setSerialNumber(e.target.value)}
+                className={inputClasses}
+              />
             </div>
             <div className="space-y-2">
-              <label htmlFor="edit-image" className="text-sm font-medium text-foreground">Image URL</label>
-              <input id="edit-image" type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className={inputClasses} />
+              <label
+                htmlFor="edit-image"
+                className="text-sm font-medium text-foreground"
+              >
+                Image URL
+              </label>
+              <input
+                id="edit-image"
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className={inputClasses}
+              />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="edit-notes" className="text-sm font-medium text-foreground">Notes</label>
+            <label
+              htmlFor="edit-notes"
+              className="text-sm font-medium text-foreground"
+            >
+              Notes
+            </label>
             <textarea
               id="edit-notes"
               value={notes}
@@ -251,10 +354,18 @@ export default function CameraDetailPage() {
               disabled={updateCamera.isPending}
               className="flex h-10 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              {updateCamera.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              {updateCamera.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
               Save Changes
             </button>
-            <button type="button" onClick={cancelEditing} className="flex h-10 items-center rounded-lg border border-border px-5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+            <button
+              type="button"
+              onClick={cancelEditing}
+              className="flex h-10 items-center rounded-lg border border-border px-5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
               Cancel
             </button>
           </div>
@@ -263,8 +374,12 @@ export default function CameraDetailPage() {
         <div className="space-y-6">
           {/* Title section */}
           <div>
-            <p className="text-sm font-medium uppercase tracking-wider text-primary">{camera.brand}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">{camera.camera_model}</h1>
+            <p className="text-sm font-medium uppercase tracking-wider text-primary">
+              {camera.brand}
+            </p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
+              {camera.camera_model}
+            </h1>
           </div>
 
           {/* Details grid */}
@@ -274,8 +389,12 @@ export default function CameraDetailPage() {
                 <Film className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs font-medium text-muted-foreground">Format</p>
-                <p className="mt-0.5 text-sm font-semibold text-foreground">{camera.camera_format}</p>
+                <p className="text-xs font-medium text-muted-foreground">
+                  Format
+                </p>
+                <p className="mt-0.5 text-sm font-semibold text-foreground">
+                  {camera.camera_format}
+                </p>
               </div>
             </div>
 
@@ -285,8 +404,12 @@ export default function CameraDetailPage() {
                   <Calendar className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">Year</p>
-                  <p className="mt-0.5 text-sm font-semibold text-foreground">{camera.year}</p>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Year
+                  </p>
+                  <p className="mt-0.5 text-sm font-semibold text-foreground">
+                    {camera.year}
+                  </p>
                 </div>
               </div>
             )}
@@ -297,8 +420,12 @@ export default function CameraDetailPage() {
                   <Hash className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">Serial Number</p>
-                  <p className="mt-0.5 font-mono text-sm font-semibold text-foreground">{camera.serial_number}</p>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Serial Number
+                  </p>
+                  <p className="mt-0.5 font-mono text-sm font-semibold text-foreground">
+                    {camera.serial_number}
+                  </p>
                 </div>
               </div>
             )}
@@ -311,7 +438,9 @@ export default function CameraDetailPage() {
                 <StickyNote className="h-4 w-4 text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">Notes</h3>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{camera.notes}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {camera.notes}
+              </p>
             </div>
           )}
 

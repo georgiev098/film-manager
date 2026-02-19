@@ -3,14 +3,31 @@ import { useLenses, useDeleteLens } from "@/hooks/useLenses";
 import LensCard from "@/components/LensCard";
 import EmptyState from "@/components/EmptyState";
 import { CircleDot, Loader2, Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LensesPage() {
   const { data: lenses, isLoading } = useLenses();
+  const { toast } = useToast();
   const deleteMutation = useDeleteLens();
 
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this lens?")) {
-      deleteMutation.mutate(id);
+      deleteMutation.mutate(id, {
+        onSuccess: () => {
+          toast({
+            title: "Lens deleted",
+            description: "The lens has been removed from your vault.",
+          });
+        },
+        onError: (error) => {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description:
+              error instanceof Error ? error.message : "Failed to delete lens.",
+          });
+        },
+      });
     }
   };
 
@@ -22,7 +39,9 @@ export default function LensesPage() {
             Lenses
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {lenses ? `${lenses.length} ${lenses.length !== 1 ? "lenses" : "lens"} in your collection` : "Loading..."}
+            {lenses
+              ? `${lenses.length} ${lenses.length !== 1 ? "lenses" : "lens"} in your collection`
+              : "Loading..."}
           </p>
         </div>
         <Link

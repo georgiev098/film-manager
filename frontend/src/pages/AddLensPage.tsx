@@ -3,10 +3,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCreateLens } from "@/hooks/useLenses";
 import type { LensType } from "@/types";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AddLensPage() {
   const navigate = useNavigate();
   const createLens = useCreateLens();
+  const { toast } = useToast();
 
   const [manufacturer, setManufacturer] = useState("");
   const [lensType, setLensType] = useState<LensType>("analog");
@@ -28,6 +30,11 @@ export default function AddLensPage() {
     const maxFocalNum = parseInt(maxFocal, 10);
 
     if (maxFocalNum < minFocalNum) {
+      toast({
+        variant: "destructive",
+        title: "Check Focal Length",
+        description: "Maximum focal length must be greater than minimum.",
+      });
       setError("Max focal length cannot be less than min focal length.");
       return;
     }
@@ -45,8 +52,18 @@ export default function AddLensPage() {
         image_url: imageUrl || null,
         notes: notes || null,
       });
+      toast({
+        title: "Lens added!",
+        description: `${manufacturer} lens has been added to your vault.`,
+      });
       navigate("/lenses");
-    } catch {
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Could not add lens",
+        description:
+          error?.message || "Please check your connection and try again.",
+      });
       setError("Failed to add lens. Please check your inputs.");
     }
   };
@@ -84,7 +101,10 @@ export default function AddLensPage() {
         {/* Manufacturer & Type */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="manufacturer" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="manufacturer"
+              className="text-sm font-medium text-foreground"
+            >
               Manufacturer <span className="text-destructive">*</span>
             </label>
             <input
@@ -98,7 +118,10 @@ export default function AddLensPage() {
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="lensType" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="lensType"
+              className="text-sm font-medium text-foreground"
+            >
               Lens Type <span className="text-destructive">*</span>
             </label>
             <select
@@ -116,7 +139,10 @@ export default function AddLensPage() {
         {/* Focal Length Range */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="minFocal" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="minFocal"
+              className="text-sm font-medium text-foreground"
+            >
               Min Focal Length (mm) <span className="text-destructive">*</span>
             </label>
             <input
@@ -131,7 +157,10 @@ export default function AddLensPage() {
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="maxFocal" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="maxFocal"
+              className="text-sm font-medium text-foreground"
+            >
               Max Focal Length (mm) <span className="text-destructive">*</span>
             </label>
             <input
@@ -150,7 +179,10 @@ export default function AddLensPage() {
         {/* Aperture Range */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="maxAperture" className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="maxAperture"
+              className="text-sm font-medium text-foreground"
+            >
               Max Aperture (widest) <span className="text-destructive">*</span>
             </label>
             <input
@@ -164,8 +196,12 @@ export default function AddLensPage() {
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="minAperture" className="text-sm font-medium text-foreground">
-              Min Aperture (narrowest) <span className="text-destructive">*</span>
+            <label
+              htmlFor="minAperture"
+              className="text-sm font-medium text-foreground"
+            >
+              Min Aperture (narrowest){" "}
+              <span className="text-destructive">*</span>
             </label>
             <input
               id="minAperture"
@@ -181,7 +217,10 @@ export default function AddLensPage() {
 
         {/* Mount */}
         <div className="space-y-2">
-          <label htmlFor="mount" className="text-sm font-medium text-foreground">
+          <label
+            htmlFor="mount"
+            className="text-sm font-medium text-foreground"
+          >
             Mount <span className="text-destructive">*</span>
           </label>
           <input
@@ -219,7 +258,10 @@ export default function AddLensPage() {
 
         {/* Image URL */}
         <div className="space-y-2">
-          <label htmlFor="imageUrl" className="text-sm font-medium text-foreground">
+          <label
+            htmlFor="imageUrl"
+            className="text-sm font-medium text-foreground"
+          >
             Image URL
           </label>
           <input
@@ -234,7 +276,10 @@ export default function AddLensPage() {
 
         {/* Notes */}
         <div className="space-y-2">
-          <label htmlFor="notes" className="text-sm font-medium text-foreground">
+          <label
+            htmlFor="notes"
+            className="text-sm font-medium text-foreground"
+          >
             Notes
           </label>
           <textarea

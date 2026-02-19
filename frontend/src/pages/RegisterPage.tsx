@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Camera, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RegisterPage() {
   const { register } = useAuth();
+  const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,9 +20,23 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register({ username, email, password });
+
+      // SUCCESS TOAST
+      toast({
+        title: "Account created!",
+        description: "Welcome to CamVault. You can now start adding gear.",
+      });
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Registration failed. Try again.";
+
+      // ERROR TOAST
+      toast({
+        variant: "destructive",
+        title: "Registration Error",
+        description: message,
+      });
+
       setError(message);
     } finally {
       setLoading(false);
@@ -139,10 +155,7 @@ export default function RegisterPage() {
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link
-          to="/login"
-          className="font-medium text-primary hover:underline"
-        >
+        <Link to="/login" className="font-medium text-primary hover:underline">
           Sign in
         </Link>
       </p>

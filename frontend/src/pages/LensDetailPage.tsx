@@ -17,10 +17,12 @@ import {
   Loader2,
   Check,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LensDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { data: lens, isLoading, isError } = useLens(Number(id));
   const updateLens = useUpdateLens();
   const deleteLens = useDeleteLens();
@@ -69,6 +71,11 @@ export default function LensDetailPage() {
     const maxFocalNum = parseInt(maxFocal, 10);
     if (maxFocalNum < minFocalNum) {
       setError("Max focal length cannot be less than min focal length.");
+      toast({
+        variant: "destructive",
+        title: "Invalid Focal Length",
+        description: "Max focal length cannot be less than min focal length.",
+      });
       return;
     }
 
@@ -89,8 +96,17 @@ export default function LensDetailPage() {
         },
       });
       setEditing(false);
+      toast({
+        title: "Lens updated",
+        description: "Your changes have been saved successfully.",
+      });
     } catch {
       setError("Failed to update lens.");
+      toast({
+        variant: "destructive",
+        title: "Update failed",
+        description: "There was a problem saving your changes.",
+      });
     }
   };
 
@@ -98,9 +114,18 @@ export default function LensDetailPage() {
     if (!window.confirm("Are you sure you want to delete this lens?")) return;
     try {
       await deleteLens.mutateAsync(Number(id));
+      toast({
+        title: "Lens deleted",
+        description: "The lens has been removed from your vault.",
+      });
       navigate("/lenses");
     } catch {
       setError("Failed to delete lens.");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not delete the lens. Please try again.",
+      });
     }
   };
 
@@ -127,7 +152,9 @@ export default function LensDetailPage() {
         </Link>
         <div className="rounded-xl border border-border bg-card p-12 text-center">
           <CircleDot className="mx-auto h-12 w-12 text-muted-foreground/30" />
-          <p className="mt-4 text-lg font-medium text-foreground">Lens not found</p>
+          <p className="mt-4 text-lg font-medium text-foreground">
+            Lens not found
+          </p>
           <p className="mt-1 text-sm text-muted-foreground">
             This lens may have been removed or the link is incorrect.
           </p>
@@ -136,7 +163,10 @@ export default function LensDetailPage() {
     );
   }
 
-  const focalLabel = focalLengthDisplay(lens.min_focal_length, lens.max_focal_length);
+  const focalLabel = focalLengthDisplay(
+    lens.min_focal_length,
+    lens.max_focal_length,
+  );
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -187,7 +217,9 @@ export default function LensDetailPage() {
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-3">
             <CircleDot className="h-16 w-16 text-muted-foreground/20" />
-            <p className="text-sm text-muted-foreground/40">No image uploaded</p>
+            <p className="text-sm text-muted-foreground/40">
+              No image uploaded
+            </p>
           </div>
         )}
         <div className="absolute left-4 top-4 flex items-center gap-2">
@@ -205,22 +237,51 @@ export default function LensDetailPage() {
 
       {/* Content */}
       {editing ? (
-        <form onSubmit={handleSave} className="space-y-6 rounded-xl border border-border bg-card p-6">
+        <form
+          onSubmit={handleSave}
+          className="space-y-6 rounded-xl border border-border bg-card p-6"
+        >
           <div className="flex items-center justify-between border-b border-border pb-4">
             <h2 className="text-lg font-semibold text-foreground">Edit Lens</h2>
-            <button type="button" onClick={cancelEditing} className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+            <button
+              type="button"
+              onClick={cancelEditing}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="edit-mfr" className="text-sm font-medium text-foreground">Manufacturer <span className="text-destructive">*</span></label>
-              <input id="edit-mfr" type="text" value={manufacturer} onChange={(e) => setManufacturer(e.target.value)} required className={inputClasses} />
+              <label
+                htmlFor="edit-mfr"
+                className="text-sm font-medium text-foreground"
+              >
+                Manufacturer <span className="text-destructive">*</span>
+              </label>
+              <input
+                id="edit-mfr"
+                type="text"
+                value={manufacturer}
+                onChange={(e) => setManufacturer(e.target.value)}
+                required
+                className={inputClasses}
+              />
             </div>
             <div className="space-y-2">
-              <label htmlFor="edit-type" className="text-sm font-medium text-foreground">Lens Type <span className="text-destructive">*</span></label>
-              <select id="edit-type" value={lensType} onChange={(e) => setLensType(e.target.value as LensType)} className={inputClasses}>
+              <label
+                htmlFor="edit-type"
+                className="text-sm font-medium text-foreground"
+              >
+                Lens Type <span className="text-destructive">*</span>
+              </label>
+              <select
+                id="edit-type"
+                value={lensType}
+                onChange={(e) => setLensType(e.target.value as LensType)}
+                className={inputClasses}
+              >
                 <option value="analog">Analog</option>
                 <option value="digital">Digital</option>
               </select>
@@ -229,29 +290,95 @@ export default function LensDetailPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="edit-min-focal" className="text-sm font-medium text-foreground">Min Focal Length (mm) <span className="text-destructive">*</span></label>
-              <input id="edit-min-focal" type="number" value={minFocal} onChange={(e) => setMinFocal(e.target.value)} required min={1} className={inputClasses} />
+              <label
+                htmlFor="edit-min-focal"
+                className="text-sm font-medium text-foreground"
+              >
+                Min Focal Length (mm){" "}
+                <span className="text-destructive">*</span>
+              </label>
+              <input
+                id="edit-min-focal"
+                type="number"
+                value={minFocal}
+                onChange={(e) => setMinFocal(e.target.value)}
+                required
+                min={1}
+                className={inputClasses}
+              />
             </div>
             <div className="space-y-2">
-              <label htmlFor="edit-max-focal" className="text-sm font-medium text-foreground">Max Focal Length (mm) <span className="text-destructive">*</span></label>
-              <input id="edit-max-focal" type="number" value={maxFocal} onChange={(e) => setMaxFocal(e.target.value)} required min={1} className={inputClasses} />
+              <label
+                htmlFor="edit-max-focal"
+                className="text-sm font-medium text-foreground"
+              >
+                Max Focal Length (mm){" "}
+                <span className="text-destructive">*</span>
+              </label>
+              <input
+                id="edit-max-focal"
+                type="number"
+                value={maxFocal}
+                onChange={(e) => setMaxFocal(e.target.value)}
+                required
+                min={1}
+                className={inputClasses}
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="edit-max-ap" className="text-sm font-medium text-foreground">Max Aperture (widest) <span className="text-destructive">*</span></label>
-              <input id="edit-max-ap" type="text" value={maxAperture} onChange={(e) => setMaxAperture(e.target.value)} required className={inputClasses} />
+              <label
+                htmlFor="edit-max-ap"
+                className="text-sm font-medium text-foreground"
+              >
+                Max Aperture (widest){" "}
+                <span className="text-destructive">*</span>
+              </label>
+              <input
+                id="edit-max-ap"
+                type="text"
+                value={maxAperture}
+                onChange={(e) => setMaxAperture(e.target.value)}
+                required
+                className={inputClasses}
+              />
             </div>
             <div className="space-y-2">
-              <label htmlFor="edit-min-ap" className="text-sm font-medium text-foreground">Min Aperture (narrowest) <span className="text-destructive">*</span></label>
-              <input id="edit-min-ap" type="text" value={minAperture} onChange={(e) => setMinAperture(e.target.value)} required className={inputClasses} />
+              <label
+                htmlFor="edit-min-ap"
+                className="text-sm font-medium text-foreground"
+              >
+                Min Aperture (narrowest){" "}
+                <span className="text-destructive">*</span>
+              </label>
+              <input
+                id="edit-min-ap"
+                type="text"
+                value={minAperture}
+                onChange={(e) => setMinAperture(e.target.value)}
+                required
+                className={inputClasses}
+              />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="edit-mount" className="text-sm font-medium text-foreground">Mount <span className="text-destructive">*</span></label>
-            <input id="edit-mount" type="text" value={mount} onChange={(e) => setMount(e.target.value)} required className={inputClasses} />
+            <label
+              htmlFor="edit-mount"
+              className="text-sm font-medium text-foreground"
+            >
+              Mount <span className="text-destructive">*</span>
+            </label>
+            <input
+              id="edit-mount"
+              type="text"
+              value={mount}
+              onChange={(e) => setMount(e.target.value)}
+              required
+              className={inputClasses}
+            />
           </div>
 
           <div className="flex items-center gap-3">
@@ -262,18 +389,38 @@ export default function LensDetailPage() {
               onClick={() => setImageStabilization(!imageStabilization)}
               className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${imageStabilization ? "bg-primary" : "bg-secondary"}`}
             >
-              <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-foreground shadow-sm transition-transform ${imageStabilization ? "translate-x-5" : "translate-x-0"}`} />
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-foreground shadow-sm transition-transform ${imageStabilization ? "translate-x-5" : "translate-x-0"}`}
+              />
             </button>
-            <label className="text-sm font-medium text-foreground">Image Stabilization</label>
+            <label className="text-sm font-medium text-foreground">
+              Image Stabilization
+            </label>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="edit-image" className="text-sm font-medium text-foreground">Image URL</label>
-            <input id="edit-image" type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className={inputClasses} />
+            <label
+              htmlFor="edit-image"
+              className="text-sm font-medium text-foreground"
+            >
+              Image URL
+            </label>
+            <input
+              id="edit-image"
+              type="url"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              className={inputClasses}
+            />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="edit-notes" className="text-sm font-medium text-foreground">Notes</label>
+            <label
+              htmlFor="edit-notes"
+              className="text-sm font-medium text-foreground"
+            >
+              Notes
+            </label>
             <textarea
               id="edit-notes"
               value={notes}
@@ -291,10 +438,18 @@ export default function LensDetailPage() {
               disabled={updateLens.isPending}
               className="flex h-10 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              {updateLens.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              {updateLens.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
               Save Changes
             </button>
-            <button type="button" onClick={cancelEditing} className="flex h-10 items-center rounded-lg border border-border px-5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+            <button
+              type="button"
+              onClick={cancelEditing}
+              className="flex h-10 items-center rounded-lg border border-border px-5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
               Cancel
             </button>
           </div>
@@ -303,9 +458,15 @@ export default function LensDetailPage() {
         <div className="space-y-6">
           {/* Title section */}
           <div>
-            <p className="text-sm font-medium uppercase tracking-wider text-primary">{lens.manufacturer}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">{focalLabel}</h1>
-            <p className="mt-1 text-base text-muted-foreground">{lens.max_aperture}</p>
+            <p className="text-sm font-medium uppercase tracking-wider text-primary">
+              {lens.manufacturer}
+            </p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
+              {focalLabel}
+            </h1>
+            <p className="mt-1 text-base text-muted-foreground">
+              {lens.max_aperture}
+            </p>
           </div>
 
           {/* Details grid */}
@@ -315,8 +476,12 @@ export default function LensDetailPage() {
                 <Target className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs font-medium text-muted-foreground">Focal Length</p>
-                <p className="mt-0.5 text-sm font-semibold text-foreground">{focalLabel}</p>
+                <p className="text-xs font-medium text-muted-foreground">
+                  Focal Length
+                </p>
+                <p className="mt-0.5 text-sm font-semibold text-foreground">
+                  {focalLabel}
+                </p>
               </div>
             </div>
 
@@ -325,8 +490,12 @@ export default function LensDetailPage() {
                 <Aperture className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs font-medium text-muted-foreground">Aperture Range</p>
-                <p className="mt-0.5 text-sm font-semibold text-foreground">{lens.max_aperture} - {lens.min_aperture}</p>
+                <p className="text-xs font-medium text-muted-foreground">
+                  Aperture Range
+                </p>
+                <p className="mt-0.5 text-sm font-semibold text-foreground">
+                  {lens.max_aperture} - {lens.min_aperture}
+                </p>
               </div>
             </div>
 
@@ -335,8 +504,12 @@ export default function LensDetailPage() {
                 <Settings className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs font-medium text-muted-foreground">Mount</p>
-                <p className="mt-0.5 text-sm font-semibold text-foreground">{lens.mount}</p>
+                <p className="text-xs font-medium text-muted-foreground">
+                  Mount
+                </p>
+                <p className="mt-0.5 text-sm font-semibold text-foreground">
+                  {lens.mount}
+                </p>
               </div>
             </div>
           </div>
@@ -361,7 +534,9 @@ export default function LensDetailPage() {
                 <StickyNote className="h-4 w-4 text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">Notes</h3>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{lens.notes}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {lens.notes}
+              </p>
             </div>
           )}
 

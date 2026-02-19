@@ -3,14 +3,32 @@ import { useCameras, useDeleteCamera } from "@/hooks/useCameras";
 import CameraCard from "@/components/CameraCard";
 import EmptyState from "@/components/EmptyState";
 import { Camera, Loader2, Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CamerasPage() {
   const { data: cameras, isLoading } = useCameras();
+  const { toast } = useToast();
   const deleteMutation = useDeleteCamera();
 
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this camera?")) {
-      deleteMutation.mutate(id);
+      deleteMutation.mutate(id, {
+        onSuccess: () => {
+          toast({
+            title: "Camera deleted",
+            description: "The camera body has been removed from your vault.",
+          });
+        },
+        onError: (error) => {
+          toast({
+            variant: "destructive",
+            title: "Delete failed",
+            description:
+              error?.message ||
+              "Something went wrong while removing the camera.",
+          });
+        },
+      });
     }
   };
 
@@ -22,7 +40,9 @@ export default function CamerasPage() {
             Cameras
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {cameras ? `${cameras.length} camera${cameras.length !== 1 ? "s" : ""} in your collection` : "Loading..."}
+            {cameras
+              ? `${cameras.length} camera${cameras.length !== 1 ? "s" : ""} in your collection`
+              : "Loading..."}
           </p>
         </div>
         <Link

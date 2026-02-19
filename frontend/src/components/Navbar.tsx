@@ -11,6 +11,7 @@ import {
   Plus,
   X,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const navLinks = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -20,11 +21,16 @@ const navLinks = [
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
+    toast({
+      title: "Logged out",
+      description: "You have been safely signed out of your vault.",
+    });
     navigate("/login");
   };
 
